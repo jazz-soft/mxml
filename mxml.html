@@ -1,0 +1,21 @@
+<!doctype html>
+<html>
+<head>
+<meta charset=utf8>
+<title>mxml</title>
+</head>
+<body>
+<h1>mxml</h1>
+<p><input id="file" type="file" onchange="load();"></p>
+<p id="editor"></p>
+<script src="mxml.js"></script>
+<script>
+var editor = new MxmlEditor('editor');
+function load() {
+  var reader = new FileReader();
+  reader.onload = function(e) { editor.setText(e.target.result); };
+  reader.readAsText(document.getElementById('file').files[0]);
+}
+</script>
+</body>
+</html>
