@@ -1,5 +1,5 @@
 <BODY>
 module.exports = {
-  p2t: p2t,
-  t2p: t2p
+  elements: elements,
+  attributes: attributes
 };
