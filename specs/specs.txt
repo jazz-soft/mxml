@@ -1,5 +1,0 @@
-<BODY>
-module.exports = {
-  elements: elements,
-  attributes: attributes
-};

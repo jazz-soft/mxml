@@ -1,11 +1,11 @@
 import {EditorView, basicSetup} from "codemirror"
 import {syntaxTree} from '@codemirror/language';
 import {xml} from "@codemirror/lang-xml"
-import specs from "./specs.cjs"
+import MXML from "jazz-mxml";
 
 function MxmlEditor(where) {
   this.editor = new EditorView({
-    extensions: [basicSetup, xml({elements: specs.elements})],
+    extensions: [basicSetup, xml()],
     parent: document.getElementById(where)
   });
   this.setText = function(txt) {
