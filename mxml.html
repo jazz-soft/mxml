@@ -18,8 +18,8 @@
 var editor = new MxmlEditor('editor');
 function load() {
   var reader = new FileReader();
-  reader.onload = function(e) { editor.setText(e.target.result); };
-  reader.readAsText(document.getElementById('file').files[0]);
+  reader.onload = function(e) { editor.loadData(new Uint8Array(e.target.result)); };
+  reader.readAsArrayBuffer(document.getElementById('file').files[0]);
 }
 </script>
 </body>

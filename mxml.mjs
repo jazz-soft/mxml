@@ -1,7 +1,7 @@
 import {EditorView, basicSetup} from "codemirror"
 import {syntaxTree} from '@codemirror/language';
 import {xml} from "@codemirror/lang-xml"
-import MXML from "jazz-mxml";
+import * as MXML from "jazz-mxml";
 
 function MxmlEditor(where) {
   this.editor = new EditorView({
@@ -16,6 +16,9 @@ function MxmlEditor(where) {
   };
   this.getText = function() {
     return this.editor.state.doc.toString();
+  };
+  this.loadData = async function(data) {
+    this.setText(await MXML.unzip(data) || new TextDecoder().decode(data));  
   };
   this.test = function() {
     var tree = syntaxTree(this.editor.state);
