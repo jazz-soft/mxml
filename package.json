@@ -1,6 +1,6 @@
 {
   "scripts": {
-    "build": "rollup mxml.mjs -f iife -o mxml.js -p @rollup/plugin-node-resolve -p @rollup/plugin-commonjs"
+    "build": "rollup -c"
   },
   "dependencies": {
     "@codemirror/lang-xml": "^6.1.0",
@@ -13,7 +13,7 @@
     "@rollup/plugin-commonjs": "^28.0.1",
     "@rollup/plugin-node-resolve": "^15.3.0",
     "fast-xml-parser": "^4.5.0",
-    "rollup": "^4.24.0"
+    "rollup": "^4.24.3"
   },
   "private": true
 }
