@@ -1,11 +1,32 @@
 import {EditorView, basicSetup} from "codemirror"
 import {syntaxTree} from '@codemirror/language';
 import {xml} from "@codemirror/lang-xml"
-import * as MXML from "jazz-mxml";
+import MXML from "jazz-mxml";
+
+function watcher(self) {
+  return EditorView.updateListener.of((update) => {
+    if (update.docChanged) {
+      var notify = false;
+      var txt = update.state.doc.toString().trim();
+      var X = new MXML(txt);
+      if (X.isValid()) {
+        if (!self.summary.valid) notify = true;
+        self.summary.valid = true;
+      }
+      else {
+        if (self.summary.valid) notify = true;
+        self.summary.valid = false;
+      }
+      if (notify) self.notify(self.summary);
+    }
+  });
+}
 
 function MxmlEditor(where) {
+  this.summary = { valid: false };
+  this.notify = function() {};
   this.editor = new EditorView({
-    extensions: [basicSetup, xml()],
+    extensions: [basicSetup, xml(), watcher(this)],
     parent: document.getElementById(where)
   });
   this.setText = function(txt) {

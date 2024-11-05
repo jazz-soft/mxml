@@ -16,6 +16,9 @@
 <script src="mxml.js"></script>
 <script>
 var editor = new MxmlEditor('editor');
+editor.notify = function(summary) {
+  console.log(summary);
+};
 function load() {
   var reader = new FileReader();
   reader.onload = function(e) { editor.loadData(new Uint8Array(e.target.result)); };
