@@ -9,9 +9,18 @@ function watcher(self) {
       var notify = false;
       var txt = update.state.doc.toString().trim();
       var X = new MXML(txt);
+      var type;
       if (X.isValid()) {
         if (!self.summary.valid) notify = true;
         self.summary.valid = true;
+        if (X.isPartwise()) type = 'partwise';
+        else if (X.isTimewise()) type = 'timewise';
+        else if (X.isOpus()) type = 'opus';
+        else if (X.isMei()) type = 'mei';
+        if (self.summary.type != type) notify = true;
+        self.summary.type = type;
+        if (self.summary.zip != self.zip) notify = true;
+        self.summary.zip = self.zip;
       }
       else {
         if (self.summary.valid) notify = true;
@@ -39,7 +48,13 @@ function MxmlEditor(where) {
     return this.editor.state.doc.toString();
   };
   this.loadData = async function(data) {
-    this.setText(await MXML.unzip(data) || new TextDecoder().decode(data));  
+    var txt = await MXML.unzip(data);
+    if (txt) this.zip = true;
+    else {
+      this.zip = true;
+      txt = new TextDecoder().decode(data);
+    }
+    this.setText(txt);  
   };
   this.test = function() {
     var tree = syntaxTree(this.editor.state);

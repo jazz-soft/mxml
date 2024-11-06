@@ -11,7 +11,10 @@
 </head>
 <body>
 <h1>mxml</h1>
-<p><input id="file" type="file" onchange="load();"></p>
+<p>
+<span><input id="file" type="file" onchange="load();"></span>
+<span><label for="menu">View as:</label> <select id="menu" type="select" onchange="onmenu();"></select></span>
+</p>
 <p id="editor"></p>
 <script src="mxml.js"></script>
 <script>
@@ -23,6 +26,8 @@ function load() {
   var reader = new FileReader();
   reader.onload = function(e) { editor.loadData(new Uint8Array(e.target.result)); };
   reader.readAsArrayBuffer(document.getElementById('file').files[0]);
+}
+function onmenu() {
 }
 </script>
 </body>
