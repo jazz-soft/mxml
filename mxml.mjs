@@ -11,16 +11,15 @@ function watcher(self) {
       var X = new MXML(txt);
       var type;
       if (X.isValid()) {
-        if (!self.summary.valid) notify = true;
-        self.summary.valid = true;
         if (X.isPartwise()) type = 'partwise';
         else if (X.isTimewise()) type = 'timewise';
         else if (X.isOpus()) type = 'opus';
         else if (X.isMei()) type = 'mei';
-        if (self.summary.type != type) notify = true;
+        if (!self.summary.valid || self.summary.type != type || self.summary.zip != self.zip || self.summary.mxl != self.mxl) notify = true;
+        self.summary.valid = true;
         self.summary.type = type;
-        if (self.summary.zip != self.zip) notify = true;
         self.summary.zip = self.zip;
+        self.summary.mxl = self.mxl;
       }
       else {
         if (self.summary.valid) notify = true;
@@ -48,10 +47,19 @@ function MxmlEditor(where) {
     return this.editor.state.doc.toString();
   };
   this.loadData = async function(data) {
-    var txt = await MXML.unzip(data);
-    if (txt) this.zip = true;
-    else {
+    var txt;
+    var info = MXML.zipInfo(data);
+    if (info) {
+      txt = await MXML.unzip(data);
+    }
+    if (txt) {
+      this.mxl = false;
+      for (var x of info) if (x.name == 'META-INF/container.xml') this.mxl = true;
       this.zip = true;
+    }
+    else {
+      this.mxl = false;
+      this.zip = false;
       txt = new TextDecoder().decode(data);
     }
     this.setText(txt);  
