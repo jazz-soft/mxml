@@ -15,11 +15,9 @@ function watcher(self) {
         else if (X.isTimewise()) type = 'timewise';
         else if (X.isOpus()) type = 'opus';
         else if (X.isMei()) type = 'mei';
-        if (!self.summary.valid || self.summary.type != type || self.summary.zip != self.zip || self.summary.mxl != self.mxl) notify = true;
+        if (!self.summary.valid || self.summary.type != type) notify = true;
         self.summary.valid = true;
         self.summary.type = type;
-        self.summary.zip = self.zip;
-        self.summary.mxl = self.mxl;
       }
       else {
         if (self.summary.valid) notify = true;
@@ -31,6 +29,7 @@ function watcher(self) {
 }
 
 function MxmlEditor(where) {
+  this.MXML = MXML;
   this.summary = { valid: false };
   this.notify = function() {};
   this.editor = new EditorView({
@@ -47,22 +46,20 @@ function MxmlEditor(where) {
     return this.editor.state.doc.toString();
   };
   this.loadData = async function(data) {
-    var txt;
+    var txt, mxl, zip;
     var info = MXML.zipInfo(data);
     if (info) {
       txt = await MXML.unzip(data);
     }
     if (txt) {
-      this.mxl = false;
-      for (var x of info) if (x.name == 'META-INF/container.xml') this.mxl = true;
-      this.zip = true;
+      for (var x of info) if (x.name == 'META-INF/container.xml') mxl = true;
+      zip = true;
     }
     else {
-      this.mxl = false;
-      this.zip = false;
       txt = new TextDecoder().decode(data);
     }
-    this.setText(txt);  
+    this.setText(txt);
+    return { mxl: mxl, zip: zip };
   };
   this.test = function() {
     var tree = syntaxTree(this.editor.state);

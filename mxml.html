@@ -3,6 +3,7 @@
 <head>
 <meta charset=utf8>
 <title>mxml</title>
+<script src="node_modules/jzz/javascript/JZZ.js"></script>
 <style>
 #menu {width:16em;}
 #editor {height:32em;border-style:solid;border-width: 1px;border-color:silver;}
@@ -15,43 +16,87 @@
 <p>
 <span><input id="file" type="file" onchange="load();"></span>
 <span><label for="menu">View as:</label> <select id="menu" onchange="onmenu();"></select></span>
+<span><button id="down" onclick="download();">Download</button></span>
 </p>
 <p id="editor"></p>
 <script src="mxml.js"></script>
 <script>
-var editor = new MxmlEditor('editor');
 var menu = document.getElementById('menu');
-menu.disabled = true;
+var down = document.getElementById('down');
+var down_link;
+var sum = {};
+var editor = new MxmlEditor('editor');
+editor.notify = update;
+disable();
+function disable() {
+  menu.disabled = true;
+  down.disabled = true;
+}
+function enable() {
+  menu.disabled = false;
+  down.disabled = false;
+}
 function add_menu(t, v, b) {
   var o = document.createElement('option');
   o.text = t; o.value = v; o.selected = !!b;
   menu.add(o);
 }
-editor.notify = function(summary) {
-  var i, o;
-  for (i = menu.options.length - 1; i >= 0; i--) menu.remove(i);
-  if (summary.valid) {
-    menu.disabled = false;
-    if (summary.type == 'partwise' || summary.type == 'timewise') {
-      add_menu('XML (partwise)', 'partwise', summary.type == 'partwise' && !summary.mxl);
-      add_menu('MXL (partwise, compressed)', 'zpartwise', summary.type == 'partwise' && summary.mxl);
-      add_menu('XML (timewise)', 'timewise', summary.type == 'timewise' && !summary.mxl);
-      add_menu('MXL (timewise, compressed)', 'ztimewise' && summary.mxl);
+function update(x) {
+  var k;
+  for (k of Object.keys(x)) sum[k] = x[k];
+  down_link = undefined;
+  for (k = menu.options.length - 1; k >= 0; k--) menu.remove(k);
+  if (sum.valid) {
+    if (sum.type == 'partwise' || sum.type == 'timewise') {
+      add_menu('XML (partwise)', 'part', sum.type == 'partwise' && !sum.mxl);
+      add_menu('MXL (partwise, compressed)', 'part_m', sum.type == 'partwise' && sum.mxl);
+      add_menu('XML (timewise)', 'time', sum.type == 'timewise' && !sum.mxl);
+      add_menu('MXL (timewise, compressed)', 'time_m', sum.type == 'timewise' && sum.mxl);
     }
-    else if (summary.type == 'opus') {
-      add_menu('XML (opus)', 'opus' && !summary.mxl);
-      add_menu('MXL (opus, compressed)', 'zopus' && summary.mxl);
+    else if (sum.type == 'opus') {
+      add_menu('XML (opus)', 'opus', !sum.mxl);
+      add_menu('MXL (opus, compressed)', 'opus_m', sum.mxl);
     }
+    enable();
   }
   else {
-    menu.disabled = true;
+    disable();
   }
 };
 function load() {
   var reader = new FileReader();
-  reader.onload = function(e) { editor.loadData(new Uint8Array(e.target.result)); };
-  reader.readAsArrayBuffer(document.getElementById('file').files[0]);
+  var file = document.getElementById('file').files[0];
+  reader.onload = async function(e) {
+    var x = await editor.loadData(new Uint8Array(e.target.result));
+    var name = file.name.split('.');
+    if (name.length > 1) name = name.slice(0, name.length - 1);
+    x.file = name.join('.');
+    update(x);
+  };
+  reader.readAsArrayBuffer(file);
 }
+async function download() {
+  if (down_link) {
+    document.body.appendChild(down_link);
+    down_link.click();
+    document.body.removeChild(down_link);
+  }
+  else {
+    down_link = document.createElement('a');
+    down_link.href = await make_data();
+    down_link.download = [file_name(), file_ext()].join('.');
+    download();
+  }
+}
+async function make_data() {
+  var data = editor.getText();
+  var url = 'data:' + mime_type() + ';base64,' + JZZ.lib.toBase64(data);
+  return url;
+}
+function file_name() { return sum.file || 'download'; }
+function file_ext() { return sum.mxl ? 'mxl' : 'xml'; }
+function mime_type() { return sum.mxl ? 'application/vnd.recordare.musicxml' : 'application/vnd.recordare.musicxml+xml'; }
+
 function onmenu() {
   //console.log('menu.value', menu.value);
 }
