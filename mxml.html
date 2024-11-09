@@ -95,7 +95,7 @@ async function download() {
 }
 async function make_data() {
   var data = editor.getText();
-  if (sum.mxl) data = String.fromCharCode(...await editor.MXML.zip(data));
+  if (sum.mxl) data = String.fromCharCode(...await editor.MXML.zip(new TextEncoder().encode(data)));
   var url = 'data:' + mime_type() + ';base64,' + JZZ.lib.toBase64(data);
   return url;
 }
