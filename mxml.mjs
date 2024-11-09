@@ -61,6 +61,14 @@ function MxmlEditor(where) {
     this.setText(txt);
     return { mxl: mxl, zip: zip };
   };
+  this.part2time = function() {
+    var txt = (new MXML(this.getText())).part2time();
+    if (txt) this.setText(txt);
+  };
+  this.time2part = function() {
+    var txt = new MXML(this.getText()).time2part();
+    if (txt) this.setText(txt);
+  };
   this.test = function() {
     var tree = syntaxTree(this.editor.state);
     if (!tree) { console.log('No tree'); return; }

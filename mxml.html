@@ -38,7 +38,11 @@ function enable() {
 }
 function add_menu(t, v, b) {
   var o = document.createElement('option');
-  o.text = t; o.value = v; o.selected = !!b;
+  o.text = t; o.value = v;
+  if (b) {
+    o.selected = true;
+    sum.menu = v;
+  }
   menu.add(o);
 }
 function update(x) {
@@ -52,6 +56,7 @@ function update(x) {
       add_menu('MXL (partwise, compressed)', 'part_m', sum.type == 'partwise' && sum.mxl);
       add_menu('XML (timewise)', 'time', sum.type == 'timewise' && !sum.mxl);
       add_menu('MXL (timewise, compressed)', 'time_m', sum.type == 'timewise' && sum.mxl);
+      add_menu('MIDI', 'midi');
     }
     else if (sum.type == 'opus') {
       add_menu('XML (opus)', 'opus', !sum.mxl);
@@ -90,6 +95,7 @@ async function download() {
 }
 async function make_data() {
   var data = editor.getText();
+  if (sum.mxl) data = String.fromCharCode(...await editor.MXML.zip(data));
   var url = 'data:' + mime_type() + ';base64,' + JZZ.lib.toBase64(data);
   return url;
 }
@@ -98,7 +104,20 @@ function file_ext() { return sum.mxl ? 'mxl' : 'xml'; }
 function mime_type() { return sum.mxl ? 'application/vnd.recordare.musicxml' : 'application/vnd.recordare.musicxml+xml'; }
 
 function onmenu() {
-  //console.log('menu.value', menu.value);
+  if (menu.value == 'midi') {
+    alert('coming soon...');
+    menu.value = sum.menu;
+    return;
+  }
+  down_link = undefined;
+  sum.mxl = menu.value == 'part_m' || menu.value == 'time_m' || menu.value == 'opus_m';
+  if (menu.value == 'time' || menu.value == 'time_m') {
+    if (sum.type == 'partwise') editor.part2time();
+  }
+  else if (menu.value == 'part' || menu.value == 'part_m') {
+    if (sum.type == 'timewise') editor.time2part();
+  }
+  sum.menu = menu.value;
 }
 </script>
 </body>
