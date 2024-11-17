@@ -1,4 +1,5 @@
 import {EditorView, basicSetup} from "codemirror"
+import {EditorState, Compartment} from "@codemirror/state"
 import {syntaxTree} from '@codemirror/language';
 import {xml} from "@codemirror/lang-xml"
 import MXML from "jazz-mxml";
@@ -29,13 +30,16 @@ function watcher(self) {
 }
 
 function MxmlEditor(where) {
+  const rdonly = new Compartment;
   this.MXML = MXML;
   this.summary = { valid: false };
   this.notify = function() {};
   this.editor = new EditorView({
-    extensions: [basicSetup, xml(), watcher(this)],
+    extensions: [basicSetup, rdonly.of(EditorState.readOnly.of(false)), xml(), watcher(this)],
     parent: document.getElementById(where)
   });
+  this.focus = function() { this.editor.focus(); };
+  this.setRdonly = function(b) { this.editor.dispatch({ effects: rdonly.reconfigure(EditorState.readOnly.of(b)) }); };
   this.setText = function(txt) {
     this.editor.dispatch(this.editor.state.update({
       changes: { from: 0, to: this.editor.state.doc.length, insert: txt },
