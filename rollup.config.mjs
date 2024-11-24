@@ -7,7 +7,7 @@ export default {
     file: 'mxml.js',
     format: 'iife'
   },
-  plugins: [nodejs(), commonjs(), skip('zlib')]
+  plugins: [nodejs(), commonjs(), skip('jzz', 'jzz-midi-smf')]
 };
 
 function skip(...args) {
