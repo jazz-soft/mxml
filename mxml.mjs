@@ -73,6 +73,8 @@ function MxmlEditor(where) {
     var txt = new MXML(this.getText()).time2part();
     if (txt) this.setText(txt);
   };
+  this.midi = function() { return new MXML(this.getText()).midi(); };
+  this.midi2 = function() { return new MXML(this.getText()).midi2(); };
   this.test = function() {
     var tree = syntaxTree(this.editor.state);
     if (!tree) { console.log('No tree'); return; }
