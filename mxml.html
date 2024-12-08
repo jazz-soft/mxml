@@ -6,6 +6,7 @@
 <script src="node_modules/jzz/javascript/JZZ.js"></script>
 <script src="node_modules/jzz-midi-smf/javascript/JZZ.midi.SMF.js"></script>
 <script src="node_modules/jzz-gui-player/javascript/JZZ.gui.Player.js"></script>
+<script src="node_modules/jzz-synth-tiny/javascript/JZZ.synth.Tiny.js"></script>
 <style>
 #menu {width:16em;}
 #editor {height:32em;border-style:solid;border-width: 1px;border-color:silver;}
@@ -28,7 +29,8 @@ var menu = document.getElementById('menu');
 var down = document.getElementById('down');
 var down_link;
 var sum = {};
-var player = new JZZ.gui.Player('player');
+JZZ.synth.Tiny.register('Web Audio');
+var player = new JZZ.gui.Player({ at: 'player', link: true });
 var editor = new MxmlEditor('editor');
 editor.notify = update;
 disable();
@@ -113,7 +115,9 @@ function onmenu() {
     menu.value = sum.menu;
     try {
       player.stop();
-      player.load(editor.midi());
+      midi = editor.midi();
+      player.load(midi);
+      player.setUrl('data:audio/midi;base64,' + JZZ.lib.toBase64(midi.dump()), file_name());
       player.enable();
       player.play();
     }
